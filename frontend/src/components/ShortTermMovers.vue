@@ -168,6 +168,8 @@ const initChart = async () => {
     console.log('ShortTermMovers klines:', kd)
     if (!kd.klines || kd.klines.length < 2) { console.warn('ShortTermMovers: no klines data'); return }
 
+    await new Promise(r => setTimeout(r, 350))
+
     chart = createChart(chartRef.value, {
       width: chartRef.value.clientWidth,
       height: 260,

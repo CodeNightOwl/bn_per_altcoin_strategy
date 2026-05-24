@@ -167,6 +167,8 @@ const initChart = async () => {
     console.log('CoinList klines:', kd)
     if (!kd.klines || kd.klines.length < 2) { console.warn('CoinList: no klines data'); return }
 
+    await new Promise(r => setTimeout(r, 350))
+
     chart = createChart(chartRef.value, {
       width: chartRef.value.clientWidth,
       height: 260,

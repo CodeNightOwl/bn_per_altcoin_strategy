@@ -37,7 +37,7 @@ instance/
 .env
 .env.local
 .env.*.local
-
+.deploy.env
 # Claude
 .claude/
 
