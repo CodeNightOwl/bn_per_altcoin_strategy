@@ -67,3 +67,6 @@ dist-ssr/
 # Logs
 logs/
 *.log
+
+# Deploy artifacts
+*.zip
