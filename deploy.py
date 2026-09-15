@@ -44,6 +44,9 @@ FRONTEND_DOMAIN = config["FRONTEND_DOMAIN"]
 NGINX_CONFIG_PATH = config["NGINX_CONFIG_PATH"]
 DB_PASSWORD = config["DB_PASSWORD"]
 
+# 通配符证书 *.01rj.com 在 Let's Encrypt 中的实际存储目录名（live 下的目录）
+CERT_DOMAIN = "01rj.com"
+
 
 def create_ssh_client():
     print(f"[*] 连接到服务器 {SERVER_IP}...")
@@ -166,9 +169,11 @@ def main():
             os.remove("backend.zip")
 
         print("    正在压缩backend文件夹...")
+        EXCLUDE_DIRS = {".git", "venv", ".venv", "__pycache__", "instance", "logs"}
         file_count = 0
         with zipfile.ZipFile("backend.zip", 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, dirs, files in os.walk("backend"):
+                dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS]
                 for file in files:
                     file_path = os.path.join(root, file)
                     arcname = os.path.relpath(file_path, "backend")
@@ -296,8 +301,8 @@ server {{
     listen 443 ssl http2;
     server_name {FRONTEND_DOMAIN};
 
-    ssl_certificate /etc/letsencrypt/live/{FRONTEND_DOMAIN}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{FRONTEND_DOMAIN}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{CERT_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{CERT_DOMAIN}/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
@@ -333,8 +338,8 @@ server {{
     listen 3008 ssl http2;
     server_name {FRONTEND_DOMAIN};
 
-    ssl_certificate /etc/letsencrypt/live/{FRONTEND_DOMAIN}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{FRONTEND_DOMAIN}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{CERT_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{CERT_DOMAIN}/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;

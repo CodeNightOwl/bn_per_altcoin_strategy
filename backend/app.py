@@ -50,8 +50,14 @@ def _start_market_data():
 threading.Thread(target=_start_market_data, daemon=True).start()
 
 if __name__ == '__main__':
-    app.run(
-        host=Config.FLASK_HOST,
-        port=Config.FLASK_PORT,
-        debug=Config.FLASK_DEBUG
-    )
+    if Config.FLASK_DEBUG:
+        # 本地开发：使用 Flask 自带开发服务器（带重载）
+        app.run(
+            host=Config.FLASK_HOST,
+            port=Config.FLASK_PORT,
+            debug=True
+        )
+    else:
+        # 生产：使用 waitress（多线程 WSGI 服务器），关闭 debug/reloader
+        from waitress import serve
+        serve(app, host=Config.FLASK_HOST, port=Config.FLASK_PORT, threads=8)
