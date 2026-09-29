@@ -90,6 +90,7 @@ class SignalPusher:
                     'change_pct': round(change, 4),
                     'direction': direction,
                     'price': t.get('price'),
+                    'volume_24h': t.get('volume_24h'),
                     'ts': int(now * 1000),
                     'id': f"{base}-{tf}-{int(now)}-{direction}",
                 }
