@@ -17,7 +17,7 @@
         <div class="ctrl-sep"></div>
         <div class="ctrl">
           <label>成交量≥</label>
-          <el-input-number v-model="volMin" :min="0.1" :max="50" :step="0.5" size="small" @change="load" style="width:120px" />
+          <el-input-number v-model="volMin" :min="0.1" :max="500" :step="0.5" size="small" @change="load" style="width:120px" />
           <span class="unit">M</span>
         </div>
       </div>
@@ -127,7 +127,7 @@ import { createChart, CandlestickSeries } from 'lightweight-charts'
 const data = ref({ gainers: [], losers: [] })
 const loading = ref(false)
 const threshold = ref(0.5)
-const volMin = ref(0.5)
+const volMin = ref(5)
 const timeframe = ref('5m')
 const autoRefresh = ref(true)
 const cd = ref(8)

@@ -7,6 +7,11 @@
           <el-input-number v-model="threshold" :min="0.1" :max="10" :step="0.1" size="small" @change="load" style="width:120px" />
           <span class="unit">%</span>
         </div>
+        <div class="ctrl">
+          <label>成交量≥</label>
+          <el-input-number v-model="volMin" :min="0.1" :max="500" :step="0.5" size="small" @change="load" style="width:120px" />
+          <span class="unit">M</span>
+        </div>
         <span class="desc">1分钟涨跌幅 · 按绝对值排序</span>
       </div>
       <div class="actions">
@@ -105,6 +110,7 @@ import { createChart, CandlestickSeries } from 'lightweight-charts'
 const data = ref({ gainers: [], losers: [] })
 const loading = ref(false)
 const threshold = ref(0.3)
+const volMin = ref(5)
 const autoRefresh = ref(true)
 const cd = ref(8)
 const dlg = ref({ visible: false })
@@ -120,7 +126,7 @@ const by = p => (a, b) => (Math.abs(a?.[p]) || 0) - (Math.abs(b?.[p]) || 0)
 const load = async () => {
   loading.value = true
   try {
-    const res = await coinApi.getExtremeMovers(threshold.value)
+    const res = await coinApi.getExtremeMovers(threshold.value, { volume_threshold: volMin.value * 1e6 })
     data.value = {
       ...res,
       gainers: [...(res.gainers || [])].sort((a, b) => (Math.abs(b.change_1m) || 0) - (Math.abs(a.change_1m) || 0)),

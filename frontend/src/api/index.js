@@ -22,7 +22,7 @@ export const coinApi = {
   
   getLosers: (limit = 20) => api.get('/coins/losers', { params: { limit } }),
   
-  getExtremeMovers: (threshold = 10) => api.get('/coins/extreme', { params: { threshold } }),
+  getExtremeMovers: (threshold = 10, params = {}) => api.get('/coins/extreme', { params: { threshold, ...params } }),
   
   getShortTermMovers: (params = {}) => api.get('/coins/short-term-movers', { params }),
   

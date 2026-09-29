@@ -97,6 +97,7 @@ def get_timeframe_changes():
         volume_threshold = request.args.get('volume_threshold', Config.MIN_VOLUME_USD, type=float)
         limit = request.args.get('limit', 100, type=int)
         timeframes = request.args.get('timeframes', '1m,5m,15m,30m,1h', type=str).split(',')
+        sort_by = request.args.get('sort_by', 'max_change', type=str)
 
         md = _md()
         all_tickers = md.get_all_tickers()
@@ -129,7 +130,10 @@ def get_timeframe_changes():
 
             coins_with_changes.append(coin_dict)
 
-        coins_with_changes.sort(key=lambda x: abs(x['max_change']), reverse=True)
+        if sort_by == 'volume_24h':
+            coins_with_changes.sort(key=lambda x: x['volume_24h'], reverse=True)
+        else:
+            coins_with_changes.sort(key=lambda x: abs(x['max_change']), reverse=True)
         coins_with_changes = coins_with_changes[:limit]
 
         # Fetch klines for top coins that don't have data yet

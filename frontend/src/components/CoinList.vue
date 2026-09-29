@@ -20,6 +20,15 @@
         </div>
       </div>
       <div class="actions">
+        <div class="ctrl">
+          <label>成交量≥</label>
+          <el-input-number v-model="volMin" :min="0.1" :max="500" :step="1" size="small" @change="loadData" style="width:110px" />
+          <span class="unit">M</span>
+        </div>
+        <div class="sort-toggle">
+          <button class="btn" :class="{ active: sortMode === 'volatility' }" @click="setSort('volatility')">波幅</button>
+          <button class="btn" :class="{ active: sortMode === 'volume' }" @click="setSort('volume')">成交量</button>
+        </div>
         <span class="countdown" v-if="autoRefresh">{{ cd }}s</span>
         <button class="btn" @click="loadData" :disabled="loading">{{ loading?'刷新中':'刷新' }}</button>
       </div>
@@ -27,9 +36,9 @@
 
     <div class="table-wrap">
       <el-table
+        ref="tableRef"
         :data="coins" v-loading="loading" style="width:100%" height="100%"
         @row-click="showDetail"
-        :default-sort="{prop:'max_change', order:'descending'}"
       >
         <el-table-column prop="symbol" label="币种" width="140" fixed>
           <template #default="{ row }">
@@ -128,6 +137,9 @@ const autoRefresh = ref(true)
 const cd = ref(8)
 const dlg = ref({ visible: false })
 const selectedCoin = ref(null)
+const sortMode = ref('volatility')
+const volMin = ref(5)
+const tableRef = ref(null)
 let t1 = null, t2 = null
 
 const fmtPrice = p => p != null ? (p >= 1 ? p.toFixed(p < 10 ? 4 : 2) : p.toFixed(6)) : '-'
@@ -143,15 +155,25 @@ const loadData = async () => {
   try {
     const [s, data] = await Promise.all([
       coinApi.getStats(),
-      coinApi.getTimeframeChanges({ limit: 80, timeframes: '1m,5m,15m,30m,1h', volume_threshold: 5000000 })
+      coinApi.getTimeframeChanges({
+        limit: 80,
+        timeframes: '1m,5m,15m,30m,1h',
+        volume_threshold: volMin.value * 1e6,
+        sort_by: sortMode.value === 'volume' ? 'volume_24h' : 'max_change'
+      })
     ])
     stats.value = s
     if (data.coins) {
-      coins.value = [...data.coins].sort((a, b) =>
-        (Math.abs(b.max_change) || 0) - (Math.abs(a.max_change) || 0)
-      )
+      coins.value = data.coins
     }
   } catch {} finally { loading.value = false }
+}
+
+const setSort = (mode) => {
+  if (sortMode.value === mode) return
+  sortMode.value = mode
+  tableRef.value?.clearSort()
+  loadData()
 }
 
 const chartRef = ref(null)
@@ -268,6 +290,9 @@ onUnmounted(() => { clearInterval(t1); clearInterval(t2) })
 .sc-num.down { color:#f85149; }
 .sc-label { font-size:11px; color:#484f58; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; }
 .actions { display:flex; align-items:center; gap:14px; }
+.ctrl { display:flex; align-items:center; gap:8px; }
+.ctrl label { font-size:12px; color:#8b949e; font-weight:500; }
+.unit { font-size:12px; color:#484f58; }
 
 .countdown {
   font-family:'JetBrains Mono',monospace; font-size:13px; color:#484f58;
@@ -280,6 +305,12 @@ onUnmounted(() => { clearInterval(t1); clearInterval(t2) })
 }
 .btn:hover { background:#30363d; border-color:#58a6ff; color:#f0f6fc; }
 .btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+.sort-toggle { display:flex; border:1px solid #30363d; border-radius:6px; overflow:hidden; }
+.sort-toggle .btn { border:none; border-radius:0; padding:8px 16px; }
+.sort-toggle .btn + .btn { border-left:1px solid #30363d; }
+.sort-toggle .btn.active { background:#58a6ff; color:#0d1117; }
+.sort-toggle .btn.active:hover { background:#58a6ff; border-color:transparent; color:#0d1117; }
 
 .table-wrap { flex:1; background:#161b22; border:1px solid #21262d; border-radius:10px; overflow:hidden; min-height:0; }
 
