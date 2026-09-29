@@ -47,6 +47,10 @@ def _start_market_data():
         md.start()
         print("Market data service started (Binance REST)")
 
+    if Config.SIGNAL_PUSH_ENABLED:
+        from push_service import get_signal_pusher
+        get_signal_pusher().start()
+
 threading.Thread(target=_start_market_data, daemon=True).start()
 
 if __name__ == '__main__':

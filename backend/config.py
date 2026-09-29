@@ -38,6 +38,18 @@ class Config:
     SHORT_TERM_CHANGE_THRESHOLD = float(os.getenv('SHORT_TERM_CHANGE_THRESHOLD', 5.0))
     SHORT_TERM_TIMEFRAME = os.getenv('SHORT_TERM_TIMEFRAME', '1h')
     ENABLE_SHORT_TERM_DETECTION = os.getenv('ENABLE_SHORT_TERM_DETECTION', 'True').lower() == 'true'
+
+    # 信号推送 (ingest API) 配置
+    SIGNAL_PUSH_ENABLED = os.getenv('SIGNAL_PUSH_ENABLED', 'True').lower() == 'true'
+    INGEST_BASE_URL = os.getenv('INGEST_BASE_URL', 'https://www.hxdxm.com')
+    INGEST_TOKEN = os.getenv('INGEST_TOKEN', '')
+    INGEST_SOURCE = os.getenv('INGEST_SOURCE', 'crypto_monitor')
+    SIGNAL_5M_THRESHOLD = float(os.getenv('SIGNAL_5M_THRESHOLD', 2.0))
+    SIGNAL_1M_THRESHOLD = float(os.getenv('SIGNAL_1M_THRESHOLD', 0.8))
+    SIGNAL_VOLUME_THRESHOLD = float(os.getenv('SIGNAL_VOLUME_THRESHOLD', 5000000))
+    SIGNAL_5M_COOLDOWN_SECONDS = int(os.getenv('SIGNAL_5M_COOLDOWN_SECONDS', 600))
+    SIGNAL_1M_COOLDOWN_SECONDS = int(os.getenv('SIGNAL_1M_COOLDOWN_SECONDS', 300))
+    SIGNAL_SCAN_INTERVAL = int(os.getenv('SIGNAL_SCAN_INTERVAL', 30))
     
     MAJOR_COINS = set(os.getenv('MAJOR_COINS', 'BTC,ETH,BNB,USDT,USDC,BUSD,DAI,XRP,ADA,DOGE,SOL,DOT,MATIC,SHIB,LTC,TRX,AVAX,LINK,ATOM,UNI').split(','))
     
